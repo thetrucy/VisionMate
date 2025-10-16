@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import './function.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,21 +14,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
@@ -45,51 +31,100 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+  String? _connectedAddress;
+  final walletController = TextEditingController();
+  
+  @override
+  void dispose() {
+    // Dispose the controller to avoid memory leaks
+    walletController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              child: TextFormField(
+                controller: walletController,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'Enter your wallet address',
+                ),
+              ),
             ),
+            const SizedBox(height: 8),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.deepPurpleAccent),
+                backgroundColor: Colors.white38,
+                shadowColor: Colors.blueGrey
+              ),
+              onPressed: _connectWallet,
+              child: const Text('Connect Wallet'),
+            ),
+            const SizedBox(height: 12),
+            if (_connectedAddress != null) ...[
+              const Text('Connected address:'),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: SelectableText(
+                  _connectedAddress!,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ],
         ),
+
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+        onPressed: _navigateToFunctionPage,
+        tooltip: 'Next page',
+        child: const Icon(Icons.arrow_right),
       ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+
+  void _connectWallet() {
+    final input = walletController.text.trim();
+    if (input.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a wallet address')),
+      );
+      return;
+    }
+
+    // Basic validation: common ethereum address pattern (starts with 0x and length 42)
+    final isProbablyEthAddress = input.startsWith('0x') && input.length == 42;
+    if (!isProbablyEthAddress) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Warning: address format looks unusual')),
+      );
+    }
+
+    setState(() {
+      _connectedAddress = input;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Connected: ${_connectedAddress!}')),
+    );
+  }
+  void _navigateToFunctionPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const MyFunctionPage()),
     );
   }
 }
