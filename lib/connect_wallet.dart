@@ -2,38 +2,27 @@ import 'package:flutter/material.dart';
 import './function.dart';
 import "package:reown_appkit/reown_appkit.dart";
 
-// // AppKit Modal instance
-// final _appKitModal = ReownAppKitModal(
-//   context: BuildContext(), // required BuildContext
-//   projectId: '{YOUR_PROJECT_ID}',
-//   metadata: const PairingMetadata(
-//     name: 'Vision Mate App',
-//     description: 'App for connecting wallet and IoT device',
-//     url: 'https://github.com/thetrucy/vweb.github.io',
-//     icons: ['https://github.com/thetrucy/vweb.github.io/blob/main/vicon.png'],
-//     redirect: Redirect(
-//       native: 'https://github.com/thetrucy/vweb.github.io',
-//       universal: 'https://github.com/thetrucy/vweb.github.io',
-//       linkMode: true|false,
-//     ),
-//   ),
-//   enableAnalytics: true,
-//   siweConfig: SIWEConfig(...),
-//   featuresConfig: FeaturesConfig(...),
-//   getBalanceFallback: () async {},
-//   disconnectOnDispose: true|false,
-//   customWallets: [
-//     ReownAppKitModalWalletInfo(
-//       listing: AppKitModalWalletListing(
-//         ...
-//       ),
-//     ),
-//   ],
-// );
+// AppKit Modal instance
+late final ReownAppKitModal _appKitModal;
 
-// // Register here the event callbacks on the service you'd like to use. See `Events` section.
-
-// await _appKitModal.init();
+void initializeAppKit(BuildContext context) {
+  _appKitModal = ReownAppKitModal(
+    context: context,
+    projectId: '947c589be0bdf26edc51f4b99c32d060', // Replace with your actual project ID
+    metadata: const PairingMetadata(
+      name: 'Vision Mate App',
+      description: 'App for connecting wallet and IoT device',
+      url: 'https://github.com/thetrucy/vweb.github.io',
+      icons: ['https://github.com/thetrucy/vweb.github.io/blob/main/vicon.png'],
+      redirect: Redirect(
+        native: 'https://github.com/thetrucy/vweb.github.io',
+        universal: 'https://github.com/thetrucy/vweb.github.io',
+      ),
+    ),
+    enableAnalytics: true,
+    disconnectOnDispose: true,
+  );
+}
 
 class ConnectWalletPage extends StatefulWidget {
   const ConnectWalletPage({super.key, required this.title});
@@ -45,14 +34,36 @@ class ConnectWalletPage extends StatefulWidget {
 }
 
 class _ConnectWalletPageState extends State<ConnectWalletPage> {
-  String? _connectedAddress;
-  final walletController = TextEditingController();
-  
+  bool _isConnected = false;
+
   @override
-  void dispose() {
-    // Dispose the controller to avoid memory leaks
-    walletController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    initializeAppKit(context);
+    _setupConnectionListener();
+  }
+
+  void _setupConnectionListener() {
+    _appKitModal.addListener(() {
+      final isNowConnected = _appKitModal.isConnected;
+      if (isNowConnected && !_isConnected) {
+        // Connection just succeeded
+        _showConnectSuccess();
+      }
+      setState(() {
+        _isConnected = isNowConnected;
+      });
+    });
+  }
+
+  void _showConnectSuccess() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Wallet connected successfully!'),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 2),
+      ),
+    );
   }
 
   @override
@@ -66,75 +77,34 @@ class _ConnectWalletPageState extends State<ConnectWalletPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              child: TextFormField(
-                controller: walletController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Enter your wallet address',
-                ),
+          children: [
+            const Text(
+              'Connect Your Wallet',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 8),
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.deepPurpleAccent),
-                backgroundColor: Colors.white38,
-                shadowColor: Colors.blueGrey
-              ),
-              onPressed: _connectWallet,
-              child: const Text('Connect Wallet'),
+            const SizedBox(height: 32),
+            AppKitModalNetworkSelectButton(appKit: _appKitModal),
+            const SizedBox(height: 16),
+            AppKitModalConnectButton(appKit: _appKitModal),
+            const SizedBox(height: 16),
+            Visibility(
+              visible: _appKitModal.isConnected,
+              child: AppKitModalAccountButton(appKitModal: _appKitModal),
             ),
-            const SizedBox(height: 12),
-            if (_connectedAddress != null) ...[
-              const Text('Connected address:'),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: SelectableText(
-                  _connectedAddress!,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
           ],
         ),
-
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToFunctionPage,
         tooltip: 'Next page',
         child: const Icon(Icons.arrow_right),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 
-  void _connectWallet() {
-    final input = walletController.text.trim();
-    if (input.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a wallet address')),
-      );
-      return;
-    }
-
-    // Basic validation: common ethereum address pattern (starts with 0x and length 42)
-    final isProbablyEthAddress = input.startsWith('0x') && input.length == 42;
-    if (!isProbablyEthAddress) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Warning: address format looks unusual')),
-      );
-    }
-
-    setState(() {
-      _connectedAddress = input;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Connected: ${_connectedAddress!}')),
-    );
-  }
   void _navigateToFunctionPage() {
     Navigator.push(
       context,
