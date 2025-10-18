@@ -5,6 +5,10 @@ void main() {
   runApp(const MyApp());
 }
 
+const Color kBackgroundColor = Color.fromARGB(255, 4, 0, 24); // Dark background
+const Color kPrimaryColor = Color(0xFFFFCC00); // Bright accessible yellow
+const Color kSuccessColor = Color(0xFF4CAF50); // Green for success
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -12,9 +16,28 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Vision Mate',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: const ColorScheme.light(
+          surface: Colors.white
+        ),
+        // colorScheme: const ColorScheme.dark(
+        //   primary: kPrimaryColor,
+        //   surface: kBackgroundColor,
+        //   onSurface: Colors.white,
+        // ),
+        // scaffoldBackgroundColor: kBackgroundColor,
+        // appBarTheme: const AppBarTheme(
+        //   backgroundColor: kBackgroundColor,
+        //   elevation: 0,
+        // ),
+        // textTheme: const TextTheme(
+        //   displayLarge: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+        //   titleLarge: TextStyle(color: kPrimaryColor, fontSize: 24, fontWeight: FontWeight.bold),
+        //   bodyLarge: TextStyle(color: Colors.white, fontSize: 18),
+        //   bodyMedium: TextStyle(color: Colors.white70, fontSize: 16),
+        // ),
       ),
       home: const ConnectWalletPage(title: 'Vision Mate'),
     );

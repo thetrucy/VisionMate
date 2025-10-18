@@ -34,15 +34,33 @@ class ConnectWalletPage extends StatefulWidget {
 }
 
 class _ConnectWalletPageState extends State<ConnectWalletPage> {
+  bool _isInitialized = false;
   bool _isConnected = false;
-
   @override
   void initState() {
     super.initState();
     initializeAppKit(context);
+    // 💡 Call the new async initialization method
+    _initReownAppKit(); 
     _setupConnectionListener();
   }
-
+  void _initReownAppKit() async {
+    try {
+      await _appKitModal.init(); // This call is essential!
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+        });
+      }
+    } catch (e) {
+      // Handle initialization errors here (e.g., Project ID invalid)
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('AppKit initialization failed: $e')),
+        );
+      }
+    }
+  }
   void _setupConnectionListener() {
     _appKitModal.addListener(() {
       final isNowConnected = _appKitModal.isConnected;
@@ -100,7 +118,7 @@ class _ConnectWalletPageState extends State<ConnectWalletPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToFunctionPage,
         tooltip: 'Next page',
-        child: const Icon(Icons.arrow_right),
+        child: const Icon(Icons.arrow_right, size: 40,),
       ),
     );
   }
