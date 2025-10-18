@@ -21,7 +21,12 @@ class MyFunctionPage extends StatelessWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: 
-              Icon(Icons.book, size: 100,)            
+              TextButton(
+                onPressed: () {
+                  // Implement OCR functionality here
+                  final String result = _callOCRFunction();
+                },
+                child: const Icon(Icons.book, size: 100),           )
           ),
 
           Container( // BLIP function container
@@ -38,5 +43,10 @@ class MyFunctionPage extends StatelessWidget {
         ]
       )
     );
+  }
+
+  String _callOCRFunction() {
+    // Placeholder for OCR function call
+    return "OCR Result";
   }
 }

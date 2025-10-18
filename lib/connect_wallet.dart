@@ -88,7 +88,8 @@ class _ConnectWalletPageState extends State<ConnectWalletPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        centerTitle: true,
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
         title: Text(widget.title),
       ),
       body: Center(
@@ -116,6 +117,7 @@ class _ConnectWalletPageState extends State<ConnectWalletPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
+
         onPressed: _navigateToFunctionPage,
         tooltip: 'Next page',
         child: const Icon(Icons.arrow_right, size: 40,),

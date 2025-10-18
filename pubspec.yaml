@@ -39,7 +39,6 @@ dependencies:
   reown_appkit: ^1.6.2 
   web3dart: ^2.7.3
   webview_flutter: ^4.13.0
-  #http: ^latest_version
 
 dev_dependencies:
   flutter_test:

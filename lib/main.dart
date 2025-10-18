@@ -5,8 +5,8 @@ void main() {
   runApp(const MyApp());
 }
 
-const Color kBackgroundColor = Color.fromARGB(255, 4, 0, 24); // Dark background
-const Color kPrimaryColor = Color(0xFFFFCC00); // Bright accessible yellow
+const Color kBackgroundColor = Color.fromARGB(255, 254, 254, 254); // White background
+const Color kPrimaryColor = Color.fromARGB(255, 47, 4, 115); // Dark purple
 const Color kSuccessColor = Color(0xFF4CAF50); // Green for success
 
 class MyApp extends StatelessWidget {
@@ -20,24 +20,21 @@ class MyApp extends StatelessWidget {
       title: 'Vision Mate',
       theme: ThemeData(
         colorScheme: const ColorScheme.light(
-          surface: Colors.white
+          primary: kPrimaryColor,
+          surface: kBackgroundColor,
+          onSurface: Colors.black,
         ),
-        // colorScheme: const ColorScheme.dark(
-        //   primary: kPrimaryColor,
-        //   surface: kBackgroundColor,
-        //   onSurface: Colors.white,
-        // ),
-        // scaffoldBackgroundColor: kBackgroundColor,
-        // appBarTheme: const AppBarTheme(
-        //   backgroundColor: kBackgroundColor,
-        //   elevation: 0,
-        // ),
-        // textTheme: const TextTheme(
-        //   displayLarge: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
-        //   titleLarge: TextStyle(color: kPrimaryColor, fontSize: 24, fontWeight: FontWeight.bold),
-        //   bodyLarge: TextStyle(color: Colors.white, fontSize: 18),
-        //   bodyMedium: TextStyle(color: Colors.white70, fontSize: 16),
-        // ),
+        scaffoldBackgroundColor: kBackgroundColor,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: kBackgroundColor,
+          elevation: 0,
+        ),
+        textTheme: const TextTheme(
+          displayLarge: TextStyle(color: Colors.black, fontSize: 32, fontWeight: FontWeight.bold),
+          titleLarge: TextStyle(color: kPrimaryColor, fontSize: 24, fontWeight: FontWeight.bold),
+          bodyLarge: TextStyle(color: Colors.black, fontSize: 18),
+          bodyMedium: TextStyle(color: Colors.black, fontSize: 16),
+        ),
       ),
       home: const ConnectWalletPage(title: 'Vision Mate'),
     );
