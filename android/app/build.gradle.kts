@@ -37,6 +37,18 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    aaptOptions {
+        noCompress += "task"
+        noCompress += "litertlm"
+    }
+}
+
+dependencies {
+    // LiteRT-LM/MediaPipe LLM Inference (using genai tasks)
+    implementation("com.google.mediapipe:tasks-genai-llm-inference:0.10.13") // Use the latest stable version
+    implementation("com.google.mediapipe:tasks-vision-core:0.10.13") // For image processing/encoding
+    // Kotlin/Coroutines for async operations (Flutter-Native communication)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }
 
 flutter {
