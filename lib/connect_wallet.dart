@@ -8,7 +8,8 @@ late final ReownAppKitModal _appKitModal;
 void initializeAppKit(BuildContext context) {
   _appKitModal = ReownAppKitModal(
     context: context,
-    projectId: '947c589be0bdf26edc51f4b99c32d060', // Replace with your actual project ID
+    projectId:
+        '947c589be0bdf26edc51f4b99c32d060', // Replace with your actual project ID
     metadata: const PairingMetadata(
       name: 'Vision Mate App',
       description: 'App for connecting wallet and IoT device',
@@ -22,6 +23,20 @@ void initializeAppKit(BuildContext context) {
     enableAnalytics: true,
     disconnectOnDispose: true,
   );
+}
+
+/// Returns the currently connected wallet address as a hex string (0x...)
+/// or `null` when no wallet is connected.
+String? getCurrentWalletAddress() {
+  try {
+    if (!_appKitModal.isConnected) return null;
+    final selectedChain = _appKitModal.selectedChain?.chainId;
+    if (selectedChain == null) return null;
+    final namespace = NamespaceUtils.getNamespaceFromChain(selectedChain);
+    return _appKitModal.session?.getAddress(namespace);
+  } catch (_) {
+    return null;
+  }
 }
 
 class ConnectWalletPage extends StatefulWidget {
@@ -41,9 +56,10 @@ class _ConnectWalletPageState extends State<ConnectWalletPage> {
     super.initState();
     initializeAppKit(context);
     // 💡 Call the new async initialization method
-    _initReownAppKit(); 
+    _initReownAppKit();
     _setupConnectionListener();
   }
+
   void _initReownAppKit() async {
     try {
       await _appKitModal.init(); // This call is essential!
@@ -61,6 +77,7 @@ class _ConnectWalletPageState extends State<ConnectWalletPage> {
       }
     }
   }
+
   void _setupConnectionListener() {
     _appKitModal.addListener(() {
       final isNowConnected = _appKitModal.isConnected;
@@ -99,10 +116,7 @@ class _ConnectWalletPageState extends State<ConnectWalletPage> {
           children: [
             const Text(
               'Connect Your Wallet',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
             AppKitModalNetworkSelectButton(appKit: _appKitModal),
@@ -117,10 +131,9 @@ class _ConnectWalletPageState extends State<ConnectWalletPage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-
         onPressed: _navigateToFunctionPage,
         tooltip: 'Next page',
-        child: const Icon(Icons.arrow_right, size: 40,),
+        child: const Icon(Icons.arrow_right, size: 40),
       ),
     );
   }
